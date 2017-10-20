@@ -68,11 +68,20 @@
     ; identity (there is some e in G such that ae = ea = a for all a in G)
     ; inverse (for all a in G there is some b in G such that ab = ba = e
     (def e (ident operator G))
-    (def inverse
+    (if (not (monoid? operator G)) false
       (if (nil? e) false ; if there's no identity element then there can't be an inverse
         (reduce #(and %1 %2)
                 (map (fn [a]
                        (reduce #(or %1 %2)
                                (map #(= (operator a %) (operator % a) e) G)))
-                     G))))
-    (= (monoid? operator G) inverse)))
+                     G))))))
+
+; check if the operator and set define an abelian group
+(defn abelian? [operator G]
+  (if (not (group? operator G)) false
+    (reduce #(and %1 %2)
+            (map (fn [a]
+                   (reduce #(and %1 %2)
+                           (map #(= (operator a %) (operator % a)) G)))
+                 G))))
+
